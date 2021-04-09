@@ -1,0 +1,2 @@
+recursive-include radio_chaser/templates *
+recursive-include radio_chaser/static *
