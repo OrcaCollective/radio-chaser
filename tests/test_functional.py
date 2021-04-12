@@ -3,6 +3,7 @@
 
 See: http://webtest.readthedocs.org/
 """
+import pytest
 from flask import url_for
 
 from radio_chaser.user.models import User
@@ -65,6 +66,8 @@ class TestLoggingIn:
         assert "Unknown user" in res
 
 
+# Kept by Madison for reference
+@pytest.mark.skip("Registering is disabled")
 class TestRegistering:
     """Register a user."""
 
@@ -78,7 +81,6 @@ class TestRegistering:
         # Fills out the form
         form = res.forms["registerForm"]
         form["username"] = "foobar"
-        form["email"] = "foo@bar.com"
         form["password"] = "secret"
         form["confirm"] = "secret"
         # Submits
@@ -94,7 +96,6 @@ class TestRegistering:
         # Fills out form, but passwords don't match
         form = res.forms["registerForm"]
         form["username"] = "foobar"
-        form["email"] = "foo@bar.com"
         form["password"] = "secret"
         form["confirm"] = "secrets"
         # Submits
@@ -111,7 +112,6 @@ class TestRegistering:
         # Fills out form, but username is already registered
         form = res.forms["registerForm"]
         form["username"] = user.username
-        form["email"] = "foo@bar.com"
         form["password"] = "secret"
         form["confirm"] = "secret"
         # Submits
