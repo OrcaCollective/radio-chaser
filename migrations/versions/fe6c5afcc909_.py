@@ -5,8 +5,16 @@ Revises:
 Create Date: 2021-04-12 14:52:31.977802
 
 """
+from datetime import datetime
+
 from alembic import op
+from environs import Env
 import sqlalchemy as sa
+
+from radio_chaser.extensions import bcrypt
+
+env = Env()
+env.read_env()
 
 
 # revision identifiers, used by Alembic.
@@ -40,7 +48,13 @@ def upgrade():
     )
     # ### end Alembic commands ###
     # Custom command for adding an initial user
-    op.bulk_insert(users, [{}])
+    op.bulk_insert(users, [{
+        "username": "techbloc",
+        "password": bcrypt.generate_password_hash(env.str("ADMIN_PASSWORD")),
+        "active": True,
+        "is_admin": True,
+        "created_at": datetime.now()
+    }])
 
 
 def downgrade():
