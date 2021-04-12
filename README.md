@@ -1,59 +1,171 @@
-# Radio Chaser
+# radio-chaser
 
-Radio Chaser description
+SPD Radio Tracker
 
-## Quick Start
+## Docker Quickstart
 
-Run the application:
+This app can be run completely using `Docker` and `docker-compose`. **Using Docker is recommended, as it guarantees the application is run using compatible versions of Python and Node**.
 
-    make run
+There are three main services:
 
-And open it in the browser at [http://127.0.0.1:5000/](http://127.0.0.1:5000/)
+To run the development version of the app
 
+```bash
+docker-compose up flask-dev
+```
 
-## Prerequisites
+To run the production version of the app
 
-This is built to be used with Python 3. Update `Makefile` to switch to Python 2 if needed.
+```bash
+docker-compose up flask-prod
+```
 
-Some Flask dependencies are compiled during installation, so `gcc` and Python header files need to be present.
-For example, on Ubuntu:
+The list of `environment:` variables in the `docker-compose.yml` file takes precedence over any variables specified in `.env`.
 
-    apt install build-essential python3-dev
+To run any commands using the `Flask CLI`
 
+```bash
+docker-compose run --rm manage <<COMMAND>>
+```
 
-## Development environment and release process
+Therefore, to initialize a database you would run
 
- - create virtualenv with Flask and Radio Chaser installed into it (latter is installed in
-   [develop mode](http://setuptools.readthedocs.io/en/latest/setuptools.html#development-mode) which allows
-   modifying source code directly without a need to re-install the app): `make venv`
+```bash
+docker-compose run --rm manage db init
+docker-compose run --rm manage db migrate
+docker-compose run --rm manage db upgrade
+```
 
- - run development server in debug mode: `make run`; Flask will restart if source code is modified
+A docker volume `node-modules` is created to store NPM packages and is reused across the dev and prod versions of the application. For the purposes of DB testing with `sqlite`, the file `dev.db` is mounted to all containers. This volume mount should be removed from `docker-compose.yml` if a production DB server is used.
 
- - run tests: `make test` (see also: [Testing Flask Applications](http://flask.pocoo.org/docs/0.12/testing/))
+### Running locally
 
- - create source distribution: `make sdist` (will run tests first)
+Run the following commands to bootstrap your environment if you are unable to run the application using Docker
 
- - to remove virtualenv and built distributions: `make clean`
+```bash
+cd radio_chaser
+pip install -r requirements/dev.txt
+npm install
+npm run-script build
+npm start  # run the webpack dev server and flask server using concurrently
+```
 
- - to add more python dependencies: add to `install_requires` in `setup.py`
+You will see a pretty welcome screen.
 
- - to modify configuration in development environment: edit file `settings.cfg`; this is a local configuration file
-   and it is *ignored* by Git - make sure to put a proper configuration file to a production environment when
-   deploying
+#### Database Initialization (locally)
 
+Once you have installed your DBMS, run the following to create your app's
+database tables and perform the initial migration
+
+```bash
+flask db init
+flask db migrate
+flask db upgrade
+```
 
 ## Deployment
 
-If you are interested in an out-of-the-box deployment automation, check out accompanying
-[`cookiecutter-flask-ansible`](https://github.com/candidtim/cookiecutter-flask-ansible).
+When using Docker, reasonable production defaults are set in `docker-compose.yml`
 
-Or, check out [Deploying with Fabric](http://flask.pocoo.org/docs/0.12/patterns/fabric/#fabric-deployment) on one of the
-possible ways to automate the deployment.
+```text
+FLASK_ENV=production
+FLASK_DEBUG=0
+```
 
-In either case, generally the idea is to build a package (`make sdist`), deliver it to a server (`scp ...`),
-install it (`pip install radio_chaser.tar.gz`), ensure that configuration file exists and
-`RADIO_CHASER_SETTINGS` environment variable points to it, ensure that user has access to the
-working directory to create and write log files in it, and finally run a
-[WSGI container](http://flask.pocoo.org/docs/0.12/deploying/wsgi-standalone/) with the application.
-And, most likely, it will also run behind a
-[reverse proxy](http://flask.pocoo.org/docs/0.12/deploying/wsgi-standalone/#proxy-setups).
+Therefore, starting the app in "production" mode is as simple as
+
+```bash
+docker-compose up flask-prod
+```
+
+If running without Docker
+
+```bash
+export FLASK_ENV=production
+export FLASK_DEBUG=0
+export DATABASE_URL="<YOUR DATABASE URL>"
+npm run build   # build assets with webpack
+flask run       # start the flask server
+```
+
+## Shell
+
+To open the interactive shell, run
+
+```bash
+docker-compose run --rm manage db shell
+flask shell # If running locally without Docker
+```
+
+By default, you will have access to the flask `app`.
+
+## Running Tests/Linter
+
+To run all tests, run
+
+```bash
+docker-compose run --rm manage test
+flask test # If running locally without Docker
+```
+
+To run the linter, run
+
+```bash
+docker-compose run --rm manage lint
+flask lint # If running locally without Docker
+```
+
+The `lint` command will attempt to fix any linting/style errors in the code. If you only want to know if the code will pass CI and do not wish for the linter to make changes, add the `--check` argument.
+
+## Migrations
+
+Whenever a database migration needs to be made. Run the following commands
+
+```bash
+docker-compose run --rm manage db migrate
+flask db migrate # If running locally without Docker
+```
+
+This will generate a new migration script. Then run
+
+```bash
+docker-compose run --rm manage db upgrade
+flask db upgrade # If running locally without Docker
+```
+
+To apply the migration.
+
+For a full migration command reference, run `docker-compose run --rm manage db --help`.
+
+If you will deploy your application remotely (e.g on Heroku) you should add the `migrations` folder to version control.
+You can do this after `flask db migrate` by running the following commands
+
+```bash
+git add migrations/*
+git commit -m "Add migrations"
+```
+
+Make sure folder `migrations/versions` is not empty.
+
+## Asset Management
+
+Files placed inside the `assets` directory and its subdirectories
+(excluding `js` and `css`) will be copied by webpack's
+`file-loader` into the `static/build` directory. In production, the plugin
+`Flask-Static-Digest` zips the webpack content and tags them with a MD5 hash.
+As a result, you must use the `static_url_for` function when including static content,
+as it resolves the correct file name, including the MD5 hash.
+For example
+
+```html
+<link rel="shortcut icon" href="{{static_url_for('static', filename='build/img/favicon.ico') }}">
+```
+
+If all of your static files are managed this way, then their filenames will change whenever their
+contents do, and you can ask Flask to tell web browsers that they
+should cache all your assets forever by including the following line
+in ``.env``:
+
+```text
+SEND_FILE_MAX_AGE_DEFAULT=31556926  # one year
+```
