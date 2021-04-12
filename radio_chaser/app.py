@@ -1,10 +1,12 @@
 import os
+
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.config.from_object('radio_chaser.default_settings')
 db = SQLAlchemy(app)
+db.create_all()
 
 if not app.debug:
     import logging
