@@ -52,7 +52,8 @@ def logout():
     return redirect(url_for("public.home"))
 
 
-@blueprint.route("/register/", methods=["GET", "POST"])
+# Disabled registration for now
+# @blueprint.route("/register/", methods=["GET", "POST"])
 def register():
     """Register new user."""
     form = RegisterForm(request.form)
