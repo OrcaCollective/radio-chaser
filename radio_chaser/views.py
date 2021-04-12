@@ -1,6 +1,6 @@
 from flask import render_template
 
-from radio_chaser import app
+from radio_chaser.app import app
 
 
 @app.route('/')
