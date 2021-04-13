@@ -13,6 +13,7 @@ from flask_login import login_required, login_user, logout_user
 
 from radio_chaser.extensions import login_manager
 from radio_chaser.public.forms import LoginForm
+from radio_chaser.public.models import Radio
 from radio_chaser.user.forms import RegisterForm
 from radio_chaser.user.models import User
 from radio_chaser.utils import flash_errors
@@ -40,7 +41,7 @@ def home():
             return redirect(redirect_url)
         else:
             flash_errors(form)
-    return render_template("public/home.html", form=form)
+    return render_template("public/home.html", form=form, radios=Radio.query.all())
 
 
 @blueprint.route("/logout/")
