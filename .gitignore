@@ -8,6 +8,7 @@ load-data/
 
 # webpack-built files
 /radio_chaser/static/build/
+cache_manifest.json
 
 # Configuration
 .env
