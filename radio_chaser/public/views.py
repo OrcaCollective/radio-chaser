@@ -41,7 +41,8 @@ def home():
             return redirect(redirect_url)
         else:
             flash_errors(form)
-    return render_template("public/home.html", form=form, radios=Radio.query.all())
+    radios = Radio.query.order_by(Radio.badge).all()
+    return render_template("public/home.html", form=form, radios=radios)
 
 
 @blueprint.route("/logout/")
