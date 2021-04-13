@@ -1,39 +1,47 @@
 # -*- coding: utf-8 -*-
 """Public forms."""
 from flask_wtf import FlaskForm
-from wtforms import PasswordField, StringField
-from wtforms.validators import DataRequired
+from wtforms import IntegerField
+from wtforms.validators import DataRequired, NumberRange
 
-from radio_chaser.user.models import User
+from radio_chaser.public.models import Radio
 
 
-class LoginForm(FlaskForm):
-    """Login form."""
+class RadioForm(FlaskForm):
 
-    username = StringField("Username", validators=[DataRequired()])
-    password = PasswordField("Password", validators=[DataRequired()])
-
-    def __init__(self, *args, **kwargs):
-        """Create instance."""
-        super(LoginForm, self).__init__(*args, **kwargs)
-        self.user = None
+    badge = IntegerField(
+        "Badge",
+        validators=[
+            DataRequired(),
+            NumberRange(min=1000, max=9999, message="Badge must be exactly 4 digits"),
+        ],
+    )
+    radio = IntegerField(
+        "Radio",
+        validators=[
+            DataRequired(),
+            NumberRange(
+                min=700000,
+                max=799999,
+                message="Radio must be exactly 6 digits and start with 7",
+            ),
+        ],
+    )
 
     def validate(self):
-        """Validate the form."""
-        initial_validation = super(LoginForm, self).validate()
+        initial_validation = super().validate()
         if not initial_validation:
             return False
 
-        self.user = User.query.filter_by(username=self.username.data).first()
-        if not self.user:
-            self.username.errors.append("Unknown username")
+        # TODO: Move this into a create-only validation
+        badge = Radio.query.filter_by(badge=self.badge.data).first()
+        if badge:
+            self.badge.errors.append("Record already exists for this badge")
             return False
 
-        if not self.user.check_password(self.password.data):
-            self.password.errors.append("Invalid password")
+        radio = Radio.query.filter_by(radio=self.radio.data).first()
+        if radio:
+            self.radio.errors.append("Record already exists for this radio")
             return False
 
-        if not self.user.active:
-            self.username.errors.append("User not activated")
-            return False
         return True

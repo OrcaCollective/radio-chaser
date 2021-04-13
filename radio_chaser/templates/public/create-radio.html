@@ -1,0 +1,22 @@
+
+{% extends "layout.html" %}
+{% block content %}
+<div class="container-narrow">
+  <h1 class="mt-5">Create Radio</h1>
+    <br/>
+    <form id="radioForm" class="form form-register" method="POST" action="" role="form">
+           {{ form.csrf_token }}
+            <div class="form-group">
+                {{form.badge.label}}
+                {{form.badge(placeholder="Badge", class_="form-control")}}
+            </div>
+            <div class="form-group">
+                {{form.radio.label}}
+                {{form.radio(placeholder="Radio", class_="form-control")}}
+            </div>
+            <p><input class="btn btn-primary" type="submit" value="Create"></p>
+    </form>
+<!--    <p><em>Already registered?</em> Click <a href="/">here</a> to login.</p>-->
+</div>
+{% endblock %}
+

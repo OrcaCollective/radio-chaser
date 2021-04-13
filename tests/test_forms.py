@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test forms."""
 
-from radio_chaser.public.forms import LoginForm
-from radio_chaser.user.forms import RegisterForm
+from radio_chaser.user.forms import RegisterForm, LoginForm
 
 
 class TestRegisterForm:

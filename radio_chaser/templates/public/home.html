@@ -4,8 +4,8 @@
 <!-- Main jumbotron for a primary marketing message or call to action -->
 <div class="jumbotron">
     <div class="container">
-
         <h1 class="display-3">Radio Chaser Catalog</h1>
+        <a class="btn btn-primary" href="{{ url_for('public.add_radio') }}" role="button">Create radio record</a>
     </div>
 </div><!-- /.jumbotron -->
 
@@ -16,6 +16,7 @@
                 <tr>
                     <th scope="col">Badge</th>
                     <th scope="col">Radio</th>
+                    <th scope="col">Created</th>
                 </tr>
             </thead>
             <tbody>
@@ -23,6 +24,7 @@
                 <tr>
                     <th scope="row">{{ radio.badge }}</th>
                     <th>{{ radio.radio }}</th>
+                    <th>{{ radio.created_at.strftime('%Y-%m-%d %I:%M:%S %p') }}</th>
                 </tr>
             {% endfor %}
             </tbody>

@@ -12,9 +12,9 @@ from flask import (
 from flask_login import login_required, login_user, logout_user
 
 from radio_chaser.extensions import login_manager
-from radio_chaser.public.forms import LoginForm
+from radio_chaser.public.forms import RadioForm
 from radio_chaser.public.models import Radio
-from radio_chaser.user.forms import RegisterForm
+from radio_chaser.user.forms import RegisterForm, LoginForm
 from radio_chaser.user.models import User
 from radio_chaser.utils import flash_errors
 
@@ -43,6 +43,22 @@ def home():
             flash_errors(form)
     radios = Radio.query.order_by(Radio.badge).all()
     return render_template("public/home.html", form=form, radios=radios)
+
+
+@blueprint.route("/add-radio", methods=["GET", "POST"])
+@login_required
+def add_radio():
+    form = RadioForm(request.form)
+    if form.validate_on_submit():
+        radio = Radio.create(
+            badge=form.badge.data,
+            radio=form.radio.data,
+        )
+        flash(f"Created radio record: {radio}")
+        return redirect(url_for("public.home"))
+    else:
+        flash_errors(form)
+    return render_template("public/create-radio.html", form=form)
 
 
 @blueprint.route("/logout/")
