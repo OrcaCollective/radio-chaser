@@ -8,9 +8,9 @@ class Radio(PkModel):
     """A radio association."""
 
     __tablename__ = "radios"
-    badge = Column(db.Integer(), unique=True, nullable=False)
+    badge = Column(db.String(20), unique=True, nullable=False)
     radio = Column(db.Integer(), unique=True, nullable=False)
     created_at = Column(db.DateTime, nullable=False, default=dt.datetime.utcnow)
 
     def __repr__(self):
-        return f"<Radio {self.badge} ({self.radio})>"
+        return f"[Radio {self.badge} ({self.radio})]"

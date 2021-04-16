@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 """Public forms."""
 from flask_wtf import FlaskForm
-from wtforms import IntegerField
-from wtforms.validators import DataRequired, NumberRange
+from wtforms import IntegerField, StringField
+from wtforms.validators import DataRequired, NumberRange, Length
 
 from radio_chaser.public.models import Radio
 
 
 class RadioForm(FlaskForm):
 
-    badge = IntegerField(
+    badge = StringField(
         "Badge",
         validators=[
             DataRequired(),
-            NumberRange(min=1000, max=9999, message="Badge must be exactly 4 digits"),
+            Length(min=4, max=4, message="Badge must be exactly 4 digits"),
         ],
     )
     radio = IntegerField(
