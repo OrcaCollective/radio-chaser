@@ -16,7 +16,8 @@
                 <tr>
                     <th scope="col">Badge</th>
                     <th scope="col">Radio</th>
-                    <th scope="col">Created</th>
+                    <th scope="col">Last Updated</th>
+                    <th></th>
                     <th></th>
                 </tr>
             </thead>
@@ -25,7 +26,15 @@
                 <tr>
                     <th scope="row">{{ radio.badge }}</th>
                     <th>{{ radio.radio }}</th>
-                    <th>{{ radio.created_at.strftime('%Y-%m-%d %I:%M:%S %p') }}</th>
+                    <th>{{ radio.last_updated.strftime('%Y-%m-%d %I:%M:%S %p') }}</th>
+                    <th>
+                        {% if current_user and current_user.is_authenticated %}
+                        <form action="{{ url_for('public.update_radio', radio_id=radio.id) }}" method=get>
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                            <button type=submit class="btn btn-info"><i class="fa fa-edit"></i></button>
+                        </form>
+                        {% endif %}
+                    </th>
                     <th>
                         {% if current_user and current_user.is_authenticated %}
                         <form action="{{ url_for('public.delete_radio', radio_id=radio.id) }}" method=post>

@@ -14,7 +14,10 @@
                 {{form.radio.label}}
                 {{form.radio(placeholder="Radio", class_="form-control")}}
             </div>
-            <p><input class="btn btn-primary" type="submit" value="Create"></p>
+            <p>
+                <input class="btn btn-primary" type="submit" value="{{ action | capitalize }}">
+                <a class="btn btn-danger" href="{{ url_for('public.home') }}">Cancel</a>
+            </p>
     </form>
 <!--    <p><em>Already registered?</em> Click <a href="/">here</a> to login.</p>-->
 </div>

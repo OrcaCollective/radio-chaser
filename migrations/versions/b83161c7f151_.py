@@ -32,7 +32,7 @@ def data_load(table):
     with path.open("r", newline='') as file:
         reader = csv.DictReader(file)
         for row in reader:
-            rows.append({**row, "created_at": now})
+            rows.append({**row, "last_updated": now})
     log.info(f"Totals rows found: {len(rows)}")
     op.bulk_insert(table, rows)
 
@@ -43,7 +43,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('badge', sa.String(20), nullable=False),
     sa.Column('radio', sa.Integer(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
+    sa.Column('last_updated', sa.DateTime(), nullable=False),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('badge'),
     sa.UniqueConstraint('radio')

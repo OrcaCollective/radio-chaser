@@ -28,12 +28,14 @@ class RadioForm(FlaskForm):
         ],
     )
 
+
+class RadioCreateForm(RadioForm):
+
     def validate(self):
         initial_validation = super().validate()
         if not initial_validation:
             return False
 
-        # TODO: Move this into a create-only validation
         badge = Radio.query.filter_by(badge=self.badge.data).first()
         if badge:
             self.badge.errors.append("Record already exists for this badge")

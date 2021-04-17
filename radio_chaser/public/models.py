@@ -10,7 +10,12 @@ class Radio(PkModel):
     __tablename__ = "radios"
     badge = Column(db.String(20), unique=True, nullable=False)
     radio = Column(db.Integer(), unique=True, nullable=False)
-    created_at = Column(db.DateTime, nullable=False, default=dt.datetime.utcnow)
+    last_updated = Column(
+        db.DateTime,
+        nullable=False,
+        default=dt.datetime.utcnow,
+        onupdate=dt.datetime.utcnow,
+    )
 
     def __repr__(self):
         return f"[Radio {self.badge} ({self.radio})]"
