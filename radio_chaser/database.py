@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
 """Database module, including the SQLAlchemy database object and DB-related utilities."""
+from typing import TypeVar, Type
+
 from .compat import basestring
 from .extensions import db
 
 # Alias common SQLAlchemy names
 Column = db.Column
 relationship = db.relationship
+
+# Typing
+T = TypeVar('T')
 
 
 class CRUDMixin(object):
@@ -49,7 +54,7 @@ class PkModel(Model):
     id = Column(db.Integer, primary_key=True)
 
     @classmethod
-    def get_by_id(cls, record_id):
+    def get_by_id(cls: Type[T], record_id) -> T:
         """Get record by ID."""
         if any(
             (
