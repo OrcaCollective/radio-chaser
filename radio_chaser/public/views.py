@@ -12,12 +12,12 @@ from flask import (
     request,
     url_for,
 )
-from flask_login import login_required, login_user, logout_user
+from flask_login import login_required, login_user
 
 from radio_chaser.extensions import login_manager
 from radio_chaser.public.forms import RadioForm
 from radio_chaser.public.models import Radio
-from radio_chaser.user.forms import RegisterForm, LoginForm
+from radio_chaser.user.forms import LoginForm
 from radio_chaser.user.models import User
 from radio_chaser.utils import flash_errors
 
@@ -76,33 +76,6 @@ def delete_radio(radio_id: int):
     radio.delete()
     flash(f"Deleted radio: {radio}", "info")
     return redirect(url_for("public.home"))
-
-
-@blueprint.route("/logout/")
-@login_required
-def logout():
-    """Logout."""
-    logout_user()
-    flash("You are logged out.", "info")
-    return redirect(url_for("public.home"))
-
-
-# Disabled registration for now
-# @blueprint.route("/register/", methods=["GET", "POST"])
-def register():
-    """Register new user."""
-    form = RegisterForm(request.form)
-    if form.validate_on_submit():
-        User.create(
-            username=form.username.data,
-            password=form.password.data,
-            active=True,
-        )
-        flash("Thank you for registering. You can now log in.", "success")
-        return redirect(url_for("public.home"))
-    else:
-        flash_errors(form)
-    return render_template("public/register.html", form=form)
 
 
 @blueprint.route("/about/")
