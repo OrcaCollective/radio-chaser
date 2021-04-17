@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 """Public section, including homepage and signup."""
+import logging
+
 from flask import (
     Blueprint,
+    abort,
     current_app,
     flash,
     redirect,
@@ -19,6 +22,7 @@ from radio_chaser.user.models import User
 from radio_chaser.utils import flash_errors
 
 blueprint = Blueprint("public", __name__, static_folder="../static")
+log = logging.getLogger(__name__)
 
 
 @login_manager.user_loader
@@ -37,15 +41,15 @@ def home():
         if form.validate_on_submit():
             login_user(form.user)
             flash("You are logged in.", "success")
-            redirect_url = request.args.get("next") or url_for("user.members")
+            redirect_url = request.args.get("next") or url_for("public.home")
             return redirect(redirect_url)
         else:
             flash_errors(form)
     radios = Radio.query.order_by(Radio.badge).all()
-    return render_template("public/home.html", form=form, radios=radios)
+    return render_template("public/home.html", login_form=form, radios=radios)
 
 
-@blueprint.route("/add-radio", methods=["GET", "POST"])
+@blueprint.route("/radio/add", methods=["GET", "POST"])
 @login_required
 def add_radio():
     form = RadioForm(request.form)
@@ -54,11 +58,24 @@ def add_radio():
             badge=form.badge.data,
             radio=form.radio.data,
         )
-        flash(f"Created radio record: {radio}")
+        flash(f"Created radio record: {radio}", "info")
         return redirect(url_for("public.home"))
     else:
         flash_errors(form)
     return render_template("public/create-radio.html", form=form)
+
+
+@blueprint.route("/radio/delete/<radio_id>", methods=["POST"])
+@login_required
+def delete_radio(radio_id: int):
+    radio: Radio = Radio.get_by_id(radio_id)
+    if radio is None:
+        abort(404, description=f"Radio by ID {radio_id} not found")
+
+    log.info(f"Deleting radio: {radio}")
+    radio.delete()
+    flash(f"Deleted radio: {radio}", "info")
+    return redirect(url_for("public.home"))
 
 
 @blueprint.route("/logout/")
