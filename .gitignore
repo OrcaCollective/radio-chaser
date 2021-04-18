@@ -11,7 +11,7 @@ load-data/
 cache_manifest.json
 
 # Configuration
-.env
+*.env
 
 # Development database
 *.db

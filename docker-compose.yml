@@ -9,6 +9,7 @@ x-default-volumes: &default_volumes
     - ./:/app
     - node-modules:/app/node_modules
     - ./dev.db:/tmp/dev.db
+    - sql-db:/db
 
 services:
   flask-dev:
@@ -18,6 +19,8 @@ services:
       args:
         <<: *build_args
     image: "radio_chaser-development"
+    env_file:
+      - .env
     ports:
       - "5000:5000"
       - "2992:2992"
@@ -30,6 +33,8 @@ services:
       args:
         <<: *build_args
     image: "radio_chaser-production"
+    env_file:
+      - .prod.env
     ports:
       - "5000:5000"
     environment:
@@ -50,9 +55,12 @@ services:
       FLASK_ENV: production
       FLASK_DEBUG: 0
     image: "radio_chaser-manage"
+    env_file:
+      - .prod.env
     stdin_open: true
     tty: true
     <<: *default_volumes
 
 volumes:
   node-modules:
+  sql-db:
