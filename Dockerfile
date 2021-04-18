@@ -25,23 +25,10 @@ COPY .env.example .env
 RUN npm run-script build
 
 # ================================= PRODUCTION =================================
-FROM python:${INSTALL_PYTHON_VERSION}-slim-buster as production
-
-WORKDIR /app
-
-COPY --from=builder /app/radio_chaser/static /app/radio_chaser/static
-COPY requirements requirements
-RUN pip install --no-cache -r requirements/prod.txt
-
-COPY supervisord.conf /etc/supervisor/supervisord.conf
-COPY supervisord_programs /etc/supervisor/conf.d
-
-COPY . .
+FROM builder AS production
 
 EXPOSE 5000
-ENTRYPOINT ["/bin/bash", "shell_scripts/supervisord_entrypoint.sh"]
-CMD ["-c", "/etc/supervisor/supervisord.conf"]
-
+CMD [ "npm", "start" ]
 
 # ================================= DEVELOPMENT ================================
 FROM builder AS development
