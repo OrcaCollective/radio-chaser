@@ -29,14 +29,9 @@ FROM python:${INSTALL_PYTHON_VERSION}-slim-buster as production
 
 WORKDIR /app
 
-RUN useradd -m sid
-RUN chown -R sid:sid /app
-USER sid
-ENV PATH="/home/sid/.local/bin:${PATH}"
-
-COPY --from=builder --chown=sid:sid /app/radio_chaser/static /app/radio_chaser/static
+COPY --from=builder /app/radio_chaser/static /app/radio_chaser/static
 COPY requirements requirements
-RUN pip install --no-cache --user -r requirements/prod.txt
+RUN pip install --no-cache -r requirements/prod.txt
 
 COPY supervisord.conf /etc/supervisor/supervisord.conf
 COPY supervisord_programs /etc/supervisor/conf.d
