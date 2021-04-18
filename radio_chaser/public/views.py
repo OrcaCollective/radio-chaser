@@ -97,10 +97,3 @@ def delete_radio(radio_id: int):
     radio.delete()
     flash(f"Deleted radio: {radio}", "info")
     return redirect(url_for("public.home"))
-
-
-@blueprint.route("/about/")
-def about():
-    """About page."""
-    form = LoginForm(request.form)
-    return render_template("public/about.html", form=form)
